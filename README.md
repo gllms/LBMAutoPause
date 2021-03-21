@@ -1,3 +1,4 @@
 # LBMAutoPause
 Automatically pause Little Big Mouse while specified windows are open
-![image](https://user-images.githubusercontent.com/19732805/111925143-e5880400-8aa7-11eb-8f68-1e1ab8e4e3e9.png)
+
+![image](https://user-images.githubusercontent.com/19732805/111925261-5f1ff200-8aa8-11eb-9e5c-486f599f0201.png)
