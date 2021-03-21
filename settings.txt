@@ -1,0 +1,2 @@
+notepad.exe,Typora.exe,audacity.exe
+C:\Program Files\LittleBigMouse\LittleBigMouse_Daemon.exe

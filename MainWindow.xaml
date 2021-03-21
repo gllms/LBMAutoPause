@@ -1,0 +1,25 @@
+﻿<Window x:Class="LBMAutoPause.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:LBMAutoPause"
+        mc:Ignorable="d"
+        Title="LBM Auto Pause" Height="450" Width="800" Loaded="Window_Loaded" Closed="Window_Closed" Closing="Window_Closing">
+    <DockPanel>
+        <DockPanel DockPanel.Dock="Left">
+            <Grid DockPanel.Dock="Bottom">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Button x:Name="buttonAdd" Content="+" Grid.Column="0" Click="buttonAdd_Click" Margin="5,5,2.5,5"/>
+                <Button x:Name="buttonRemove" Content="-" Grid.Column="1" Margin="2.5,5,5,5" Click="buttonRemove_Click"/>
+            </Grid>
+            <ListBox x:Name="listBox" MinWidth="200"/>
+        </DockPanel>
+        <ScrollViewer x:Name="scrollViewer">
+            <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="10,10,10,13" TextWrapping="Wrap" VerticalAlignment="Top"/>
+        </ScrollViewer>
+    </DockPanel>
+</Window>
