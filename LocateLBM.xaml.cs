@@ -23,7 +23,7 @@ namespace LBMAutoPause
         public LocateLBM()
         {
             InitializeComponent();
-            this.Owner = App.Current.MainWindow;
+            Owner = App.Current.MainWindow;
             textBox.Focus();
         }
         public string LBMPath
@@ -40,8 +40,8 @@ namespace LBMAutoPause
 
         private void buttonAccept_Click(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = true;
-            this.Close();
+            DialogResult = true;
+            Close();
         }
     }
 }

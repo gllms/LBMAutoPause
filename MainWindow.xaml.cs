@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows;
-using System.Windows.Controls;
 using System.Management;
 using System.IO;
 using System.Diagnostics;
@@ -17,41 +16,41 @@ namespace LBMAutoPause
         public Settings settings;
         public ManagementEventWatcher startWatch;
         public ManagementEventWatcher stopWatch;
-        public System.Windows.Forms.NotifyIcon notifyIcon;
+        public NotifyIcon notifyIcon;
 
         public MainWindow()
         {
             InitializeComponent();
 
-            this.Hide();
-            notifyIcon = new System.Windows.Forms.NotifyIcon();
-            notifyIcon.Icon = new System.Drawing.Icon("pause.ico");
-            notifyIcon.Text = "LBM Auto Pause";
-            notifyIcon.Visible = true;
+            Hide();
+            notifyIcon = new NotifyIcon
+            {
+                Icon = new System.Drawing.Icon("pause.ico"),
+                Text = "LBM Auto Pause",
+                Visible = true,
+                ContextMenuStrip = new ContextMenuStrip()
+            };
+            notifyIcon.ContextMenuStrip.Items.Add("Exit", null, (object sender, EventArgs e) =>
+            {
+                notifyIcon.Visible = false;
+                Environment.Exit(0);
+            });
             notifyIcon.MouseUp += new MouseEventHandler((object sender, MouseEventArgs e) =>
             {
                 if (e.Button == MouseButtons.Left)
                 {
-                    this.Show();
-                    this.WindowState = WindowState.Normal;
-                    this.Activate();
+                    Show();
+                    WindowState = WindowState.Normal;
+                    Activate();
                     notifyIcon.Visible = false;
                 }
             });
-            notifyIcon.ContextMenuStrip = new System.Windows.Forms.ContextMenuStrip();
-            notifyIcon.ContextMenuStrip.Items.Add("Exit", null, exitClick);
-        }
-
-        private void exitClick(object sender, EventArgs e)
-        {
-            notifyIcon.Visible = false;
-            Environment.Exit(0);
         }
 
         protected override void OnStateChanged(EventArgs e)
         {
-            if (WindowState == System.Windows.WindowState.Minimized)
-                this.Hide();
+            if (WindowState == WindowState.Minimized)
+                Hide();
             notifyIcon.Visible = true;
             base.OnStateChanged(e);
         }
@@ -59,8 +58,6 @@ namespace LBMAutoPause
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             settings = new Settings(this);
-
-            // source: https://social.msdn.microsoft.com/Forums/en-US/46f52ad5-2f97-4ad8-b95c-9e06705428bd/how-to-detect-lunch-or-closing-process-?forum=netfxbcl
             startWatch = new ManagementEventWatcher(new WqlEventQuery("SELECT * FROM Win32_ProcessStartTrace"));
             startWatch.EventArrived += new EventArrivedEventHandler(startWatch_EventArrived);
             startWatch.Start();
@@ -107,7 +104,7 @@ namespace LBMAutoPause
         private void buttonAdd_Click(object sender, RoutedEventArgs e)
         {
             AddDialog addDialog = new AddDialog();
-            Nullable<bool> dialogResult = addDialog.ShowDialog();
+            bool? dialogResult = addDialog.ShowDialog();
             if (dialogResult == true)
             {
                 settings.AddProcess(addDialog.Process);
@@ -125,38 +122,32 @@ namespace LBMAutoPause
 
         public void StopLBM(string path)
         {
-            System.Diagnostics.Process.Start(path, "--stop");
+            Process.Start(path, "--stop");
             Log("LBM stopped");
         }
 
         public void StartLBM(string path)
         {
-            System.Diagnostics.Process.Start(path, "--start");
+            Process.Start(path, "--start");
             Log("LBM started");
         }
 
         public bool checkProcesses(List<string> p)
         {
-            // Log(string.Join(',', Process.GetProcesses().Select((a) => a.ProcessName)));
             foreach (Process process in Process.GetProcesses())
             {
                 try
                 {
                     if (p.Contains(Path.GetFileName(process.MainModule.FileName)))
                         return false;
-                }
-                catch
-                {
-                    // Log("unable to access " + process.ProcessName);
-                }
+                } catch {}
             }
             return true;
-            // return settings.p.Select((process) => Process.GetProcessesByName(process).Length == 0).All((b) => b);
         }
 
         public void Log(string input)
         {
-            this.Dispatcher.Invoke(() =>
+            Dispatcher.Invoke(() =>
               {
                   textBlock.Text += input + "\n";
                   scrollViewer.ScrollToBottom();
@@ -171,7 +162,7 @@ namespace LBMAutoPause
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            this.Hide();
+            Hide();
             notifyIcon.Visible = true;
             e.Cancel = true;
         }
@@ -190,57 +181,52 @@ namespace LBMAutoPause
         {
             mainWindow = m;
             listBox = m.listBox;
-            if (File.Exists(this.filePath))
+            if (File.Exists(filePath))
             {
-                string[] settingsString = System.IO.File.ReadAllText(this.filePath).Split('\n');
+                string[] settingsString = File.ReadAllText(filePath).Split('\n');
                 foreach (string e in settingsString[0].Split(','))
-                {
-                    if (e != "")
-                        this.AddProcess(e);
-                }
-                this.LBMPath = settingsString[1];
-                this.mainWindow.Log("Settings loaded from " + this.filePath);
+                    if (e != "") AddProcess(e);
+                LBMPath = settingsString[1];
+                mainWindow.Log("Settings loaded from " + filePath);
             }
-            if (!File.Exists(this.LBMPath))
+            if (!File.Exists(LBMPath))
             {
-                Nullable<bool> dialogResult = false;
                 LocateLBM locateLBMDialog = new LocateLBM();
                 while (!File.Exists(locateLBMDialog.LBMPath))
                 {
                     locateLBMDialog = new LocateLBM();
-                    dialogResult = locateLBMDialog.ShowDialog();
-                    if (dialogResult == false)
+                    if (locateLBMDialog.ShowDialog() == false)
                     {
-                        this.mainWindow.notifyIcon.Visible = false;
+                        mainWindow.notifyIcon.Visible = false;
                         Environment.Exit(0);
                     }
                 }
-                this.LBMPath = locateLBMDialog.LBMPath;
-                this.Save();
+                LBMPath = locateLBMDialog.LBMPath;
+                Save();
             }
-            if (this.mainWindow.checkProcesses(this.p))
-                this.mainWindow.StartLBM(this.LBMPath);
+            if (mainWindow.checkProcesses(p))
+                mainWindow.StartLBM(LBMPath);
             else
-                this.mainWindow.StopLBM(this.LBMPath);
+                mainWindow.StopLBM(LBMPath);
         }
 
         public void AddProcess(string process)
         {
-            this.p.Add(process);
-            this.listBox.Items.Add(process);
-            this.Save();
+            p.Add(process);
+            listBox.Items.Add(process);
+            Save();
         }
 
         public void RemoveProcess(string process)
         {
-            this.p.Remove(process);
-            this.listBox.Items.Remove(listBox.SelectedItem);
-            this.Save();
+            p.Remove(process);
+            listBox.Items.Remove(listBox.SelectedItem);
+            Save();
         }
 
         public void Save()
         {
-            File.WriteAllText(this.filePath, String.Join(',', this.p) + "\n" + this.LBMPath);
+            File.WriteAllText(filePath, string.Join(',', p) + "\n" + LBMPath);
         }
     }
 }

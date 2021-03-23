@@ -22,7 +22,7 @@ namespace LBMAutoPause
         public AddDialog()
         {
             InitializeComponent();
-            this.Owner = App.Current.MainWindow;
+            Owner = App.Current.MainWindow;
             textBox.Focus();
         }
 
@@ -40,8 +40,8 @@ namespace LBMAutoPause
 
         private void buttonAccept_Click(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = true;
-            this.Close();
+            DialogResult = true;
+            Close();
         }
 
         protected void textBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
